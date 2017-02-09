@@ -644,7 +644,7 @@ static void pmacpic_resume(void)
 			pmac_unmask_irq(irq_get_irq_data(i));
 }
 
-static struct syscore_ops pmacpic_syscore_ops = {
+static struct syscore_ops pmacpic_syscore_ops __ro_after_init = {
 	.suspend	= pmacpic_suspend,
 	.resume		= pmacpic_resume,
 };

@@ -166,7 +166,7 @@ static void lpd270_irq_resume(void)
 	__raw_writew(lpd270_irq_enabled, LPD270_INT_MASK);
 }
 
-static struct syscore_ops lpd270_irq_syscore_ops = {
+static struct syscore_ops lpd270_irq_syscore_ops __ro_after_init = {
 	.resume = lpd270_irq_resume,
 };
 

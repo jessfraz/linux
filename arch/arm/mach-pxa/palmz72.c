@@ -259,7 +259,7 @@ static void palmz72_pm_resume(void)
 	*PALMZ72_SAVE_DWORD = store_ptr;
 }
 
-static struct syscore_ops palmz72_pm_syscore_ops = {
+static struct syscore_ops palmz72_pm_syscore_ops __ro_after_init = {
 	.suspend = palmz72_pm_suspend,
 	.resume = palmz72_pm_resume,
 };

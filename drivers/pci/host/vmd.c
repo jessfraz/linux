@@ -253,7 +253,7 @@ static void vmd_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc)
 	arg->desc = desc;
 }
 
-static struct msi_domain_ops vmd_msi_domain_ops = {
+static struct msi_domain_ops vmd_msi_domain_ops __ro_after_init = {
 	.get_hwirq	= vmd_get_hwirq,
 	.msi_init	= vmd_msi_init,
 	.msi_free	= vmd_msi_free,

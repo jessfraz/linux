@@ -43,7 +43,7 @@ static void i8237A_resume(void)
 	release_dma_lock(flags);
 }
 
-static struct syscore_ops i8237_syscore_ops = {
+static struct syscore_ops i8237_syscore_ops __ro_after_init = {
 	.resume		= i8237A_resume,
 };
 

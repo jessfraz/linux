@@ -411,7 +411,7 @@ static const struct of_device_id fsl_lbc_match[] = {
 };
 
 #ifdef CONFIG_SUSPEND
-static struct syscore_ops lbc_syscore_pm_ops = {
+static struct syscore_ops lbc_syscore_pm_ops __ro_after_init = {
 	.suspend = fsl_lbc_syscore_suspend,
 	.resume = fsl_lbc_syscore_resume,
 };

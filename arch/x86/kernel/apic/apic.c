@@ -2492,7 +2492,7 @@ static void lapic_resume(void)
  * are needed on every CPU up until machine_halt/restart/poweroff.
  */
 
-static struct syscore_ops lapic_syscore_ops = {
+static struct syscore_ops lapic_syscore_ops __ro_after_init = {
 	.resume		= lapic_resume,
 	.suspend	= lapic_suspend,
 };

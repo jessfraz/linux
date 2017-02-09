@@ -203,7 +203,7 @@ static void bast_pm_resume(void)
 #define bast_pm_resume NULL
 #endif
 
-static struct syscore_ops bast_pm_syscore_ops = {
+static struct syscore_ops bast_pm_syscore_ops __ro_after_init = {
 	.suspend	= bast_pm_suspend,
 	.resume		= bast_pm_resume,
 };
@@ -581,7 +581,7 @@ static void __init bast_init(void)
 	simtec_audio_add(NULL, true, &bast_audio);
 
 	WARN_ON(gpio_request(S3C2410_GPA(21), "bast nreset"));
-	
+
 	s3c_cpufreq_setboard(&bast_cpufreq);
 }
 

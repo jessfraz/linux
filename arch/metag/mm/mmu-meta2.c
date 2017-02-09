@@ -126,7 +126,7 @@ static void mmu_resume(void)
 #define mmu_resume NULL
 #endif	/* CONFIG_METAG_SUSPEND_MEM */
 
-static struct syscore_ops mmu_syscore_ops = {
+static struct syscore_ops mmu_syscore_ops __ro_after_init = {
 	.resume  = mmu_resume,
 };
 

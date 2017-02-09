@@ -698,7 +698,7 @@ static const struct of_device_id exynos_pmu_of_device_ids[] __initconst = {
 	{ /*sentinel*/ },
 };
 
-static struct syscore_ops exynos_pm_syscore_ops;
+static struct syscore_ops exynos_pm_syscore_ops __ro_after_init;
 
 void __init exynos_pm_init(void)
 {

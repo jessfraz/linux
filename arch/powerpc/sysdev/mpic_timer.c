@@ -580,7 +580,7 @@ static const struct of_device_id mpic_timer_ids[] = {
 	{},
 };
 
-static struct syscore_ops mpic_timer_syscore_ops = {
+static struct syscore_ops mpic_timer_syscore_ops __ro_after_init = {
 	.resume = mpic_timer_resume,
 };
 

@@ -1572,7 +1572,7 @@ static void bsp_resume(void)
 		this_cpu->c_bsp_resume(&boot_cpu_data);
 }
 
-static struct syscore_ops cpu_syscore_ops = {
+static struct syscore_ops cpu_syscore_ops __ro_after_init = {
 	.resume		= bsp_resume,
 };
 

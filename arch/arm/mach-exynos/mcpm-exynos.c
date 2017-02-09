@@ -224,7 +224,7 @@ static void exynos_mcpm_setup_entry_point(void)
 	__raw_writel(virt_to_phys(mcpm_entry_point), ns_sram_base_addr + 8);
 }
 
-static struct syscore_ops exynos_mcpm_syscore_ops = {
+static struct syscore_ops exynos_mcpm_syscore_ops __ro_after_init = {
 	.resume	= exynos_mcpm_setup_entry_point,
 };
 

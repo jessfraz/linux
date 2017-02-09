@@ -2304,7 +2304,7 @@ static void ioapic_resume(void)
 	restore_ioapic_entries();
 }
 
-static struct syscore_ops ioapic_syscore_ops = {
+static struct syscore_ops ioapic_syscore_ops __ro_after_init = {
 	.suspend = save_ioapic_entries,
 	.resume = ioapic_resume,
 };

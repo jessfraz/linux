@@ -219,12 +219,12 @@ static void cpu_pm_resume(void)
 	cpu_pm_exit();
 }
 
-static struct syscore_ops cpu_pm_syscore_ops = {
+static struct syscore_ops cpu_pm_syscore_ops __ro_after_init = {
 	.suspend = cpu_pm_suspend,
 	.resume = cpu_pm_resume,
 };
 
-static int cpu_pm_init(void)
+static int __init cpu_pm_init(void)
 {
 	register_syscore_ops(&cpu_pm_syscore_ops);
 	return 0;

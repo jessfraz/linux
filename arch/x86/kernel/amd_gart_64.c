@@ -629,7 +629,7 @@ static void gart_resume(void)
 	enable_gart_translations();
 }
 
-static struct syscore_ops gart_syscore_ops = {
+static struct syscore_ops gart_syscore_ops __ro_after_init = {
 	.resume		= gart_resume,
 
 };

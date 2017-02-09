@@ -165,7 +165,7 @@ static void s5pv210_pm_resume(void)
 	s3c_pm_do_restore_core(s5pv210_core_save, ARRAY_SIZE(s5pv210_core_save));
 }
 
-static struct syscore_ops s5pv210_pm_syscore_ops = {
+static struct syscore_ops s5pv210_pm_syscore_ops __ro_after_init = {
 	.resume		= s5pv210_pm_resume,
 };
 

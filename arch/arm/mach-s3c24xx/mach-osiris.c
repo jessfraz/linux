@@ -295,7 +295,7 @@ static void osiris_pm_resume(void)
 #define osiris_pm_resume NULL
 #endif
 
-static struct syscore_ops osiris_pm_syscore_ops = {
+static struct syscore_ops osiris_pm_syscore_ops __ro_after_init = {
 	.suspend	= osiris_pm_suspend,
 	.resume		= osiris_pm_resume,
 };

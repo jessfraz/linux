@@ -1279,7 +1279,7 @@ static void fsl_pci_syscore_resume(void)
 		fsl_pci_syscore_do_resume(hose);
 }
 
-static struct syscore_ops pci_syscore_pm_ops = {
+static struct syscore_ops pci_syscore_pm_ops __ro_after_init = {
 	.suspend = fsl_pci_syscore_suspend,
 	.resume = fsl_pci_syscore_resume,
 };

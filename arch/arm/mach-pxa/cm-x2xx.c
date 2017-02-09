@@ -434,7 +434,7 @@ static void cmx2xx_resume(void)
 	__raw_writel(sleep_save_msc[2], MSC2);
 }
 
-static struct syscore_ops cmx2xx_pm_syscore_ops = {
+static struct syscore_ops cmx2xx_pm_syscore_ops __ro_after_init = {
 	.resume = cmx2xx_resume,
 	.suspend = cmx2xx_suspend,
 };

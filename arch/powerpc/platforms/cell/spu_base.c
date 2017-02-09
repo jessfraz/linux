@@ -757,7 +757,7 @@ static void spu_shutdown(void)
 	mutex_unlock(&spu_full_list_mutex);
 }
 
-static struct syscore_ops spu_syscore_ops = {
+static struct syscore_ops spu_syscore_ops __ro_after_init = {
 	.shutdown = spu_shutdown,
 };
 

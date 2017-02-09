@@ -590,7 +590,7 @@ static void alchemy_usb_resume(void)
 	alchemy_usb_pm(0);
 }
 
-static struct syscore_ops alchemy_usb_pm_ops = {
+static struct syscore_ops alchemy_usb_pm_ops __ro_after_init = {
 	.suspend	= alchemy_usb_suspend,
 	.resume		= alchemy_usb_resume,
 };

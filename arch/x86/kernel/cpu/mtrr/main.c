@@ -659,7 +659,7 @@ static void mtrr_restore(void)
 
 
 
-static struct syscore_ops mtrr_syscore_ops = {
+static struct syscore_ops mtrr_syscore_ops __ro_after_init = {
 	.suspend	= mtrr_save,
 	.resume		= mtrr_restore,
 };

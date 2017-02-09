@@ -100,7 +100,7 @@ static void irq_resume(void)
 #define irq_resume NULL
 #endif
 
-static struct syscore_ops irq_syscore_ops = {
+static struct syscore_ops irq_syscore_ops __ro_after_init = {
 	.suspend	= irq_suspend,
 	.resume		= irq_resume,
 };

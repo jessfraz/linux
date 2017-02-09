@@ -180,7 +180,7 @@ static void intc_resume(void)
 #define intc_resume	NULL
 #endif
 
-static struct syscore_ops intc_syscore_ops = {
+static struct syscore_ops intc_syscore_ops __ro_after_init = {
 	.suspend	= intc_suspend,
 	.resume		= intc_resume,
 };

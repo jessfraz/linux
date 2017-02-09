@@ -265,7 +265,7 @@ static void i8259A_shutdown(void)
 	outb(0xff, PIC_SLAVE_IMR);	/* mask all of 8259A-2 */
 }
 
-static struct syscore_ops i8259_syscore_ops = {
+static struct syscore_ops i8259_syscore_ops __ro_after_init = {
 	.suspend = i8259A_suspend,
 	.resume = i8259A_resume,
 	.shutdown = i8259A_shutdown,

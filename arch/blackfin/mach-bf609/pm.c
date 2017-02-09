@@ -300,7 +300,7 @@ static void smc_pm_syscore_resume(void)
 	bf609_nor_flash_init(NULL);
 }
 
-static struct syscore_ops smc_pm_syscore_ops = {
+static struct syscore_ops smc_pm_syscore_ops __ro_after_init = {
 	.suspend        = smc_pm_syscore_suspend,
 	.resume         = smc_pm_syscore_resume,
 };

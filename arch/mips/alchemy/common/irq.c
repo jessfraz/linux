@@ -837,12 +837,12 @@ static void alchemy_gpic_resume(void)
 	wmb();
 }
 
-static struct syscore_ops alchemy_ic_pmops = {
+static struct syscore_ops alchemy_ic_pmops __ro_after_init = {
 	.suspend	= alchemy_ic_suspend,
 	.resume		= alchemy_ic_resume,
 };
 
-static struct syscore_ops alchemy_gpic_pmops = {
+static struct syscore_ops alchemy_gpic_pmops __ro_after_init = {
 	.suspend	= alchemy_gpic_suspend,
 	.resume		= alchemy_gpic_resume,
 };

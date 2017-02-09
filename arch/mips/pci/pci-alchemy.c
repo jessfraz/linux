@@ -353,7 +353,7 @@ static void alchemy_pci_resume(void)
 	alchemy_pci_wired_entry(ctx);	/* install it */
 }
 
-static struct syscore_ops alchemy_pci_pmops = {
+static struct syscore_ops alchemy_pci_pmops __ro_after_init = {
 	.suspend	= alchemy_pci_suspend,
 	.resume		= alchemy_pci_resume,
 };

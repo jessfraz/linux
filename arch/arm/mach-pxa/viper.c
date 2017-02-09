@@ -145,7 +145,7 @@ static void viper_cpu_resume(void)
 	viper_icr_clear_bit(VIPER_ICR_R_DIS);
 }
 
-static struct syscore_ops viper_cpu_syscore_ops = {
+static struct syscore_ops viper_cpu_syscore_ops __ro_after_init = {
 	.suspend	= viper_cpu_suspend,
 	.resume		= viper_cpu_resume,
 };

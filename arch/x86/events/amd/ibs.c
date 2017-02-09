@@ -965,7 +965,7 @@ static void perf_ibs_resume(void)
 	setup_APIC_ibs();
 }
 
-static struct syscore_ops perf_ibs_syscore_ops = {
+static struct syscore_ops perf_ibs_syscore_ops __ro_after_init = {
 	.resume		= perf_ibs_resume,
 	.suspend	= perf_ibs_suspend,
 };

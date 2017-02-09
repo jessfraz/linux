@@ -621,7 +621,7 @@ static void mc_bp_resume(void)
 		reload_early_microcode();
 }
 
-static struct syscore_ops mc_syscore_ops = {
+static struct syscore_ops mc_syscore_ops __ro_after_init = {
 	.resume			= mc_bp_resume,
 };
 

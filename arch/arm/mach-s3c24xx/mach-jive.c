@@ -499,7 +499,7 @@ static void jive_pm_resume(void)
 #define jive_pm_resume NULL
 #endif
 
-static struct syscore_ops jive_pm_syscore_ops = {
+static struct syscore_ops jive_pm_syscore_ops __ro_after_init = {
 	.suspend	= jive_pm_suspend,
 	.resume		= jive_pm_resume,
 };

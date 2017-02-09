@@ -931,7 +931,7 @@ static void sec_resume(void)
 		bfin_write_SEC_SCTL(bank + BFIN_SYSIRQ(IRQ_PINT0), save_pint_sec_ctl[bank]);
 }
 
-static struct syscore_ops sec_pm_syscore_ops = {
+static struct syscore_ops sec_pm_syscore_ops __ro_after_init = {
 	.suspend = sec_suspend,
 	.resume = sec_resume,
 };

@@ -278,7 +278,7 @@ static void puv3_irq_resume(void)
 	}
 }
 
-static struct syscore_ops puv3_irq_syscore_ops = {
+static struct syscore_ops puv3_irq_syscore_ops __ro_after_init = {
 	.suspend	= puv3_irq_suspend,
 	.resume		= puv3_irq_resume,
 };

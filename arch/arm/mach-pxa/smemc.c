@@ -44,7 +44,7 @@ static void pxa3xx_smemc_resume(void)
 	__raw_writel(0x2, CSMSADRCFG);
 }
 
-static struct syscore_ops smemc_syscore_ops = {
+static struct syscore_ops smemc_syscore_ops __ro_after_init = {
 	.suspend	= pxa3xx_smemc_suspend,
 	.resume		= pxa3xx_smemc_resume,
 };

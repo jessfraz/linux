@@ -890,7 +890,7 @@ static void pmb_syscore_resume(void)
 	read_unlock(&pmb_rwlock);
 }
 
-static struct syscore_ops pmb_syscore_ops = {
+static struct syscore_ops pmb_syscore_ops __ro_after_init = {
 	.resume = pmb_syscore_resume,
 };
 

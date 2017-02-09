@@ -1041,7 +1041,7 @@ static void alchemy_dbdma_resume(void)
 	}
 }
 
-static struct syscore_ops alchemy_dbdma_syscore_ops = {
+static struct syscore_ops alchemy_dbdma_syscore_ops __ro_after_init = {
 	.suspend	= alchemy_dbdma_suspend,
 	.resume		= alchemy_dbdma_resume,
 };

@@ -208,7 +208,7 @@ static void nmi_wdt_resume(void)
 		nmi_wdt_start();
 }
 
-static struct syscore_ops nmi_syscore_ops = {
+static struct syscore_ops nmi_syscore_ops __ro_after_init = {
 	.resume		= nmi_wdt_resume,
 	.suspend	= nmi_wdt_suspend,
 };

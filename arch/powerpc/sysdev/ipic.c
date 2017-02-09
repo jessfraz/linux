@@ -935,7 +935,7 @@ static void ipic_resume(void)
 #define ipic_resume NULL
 #endif
 
-static struct syscore_ops ipic_syscore_ops = {
+static struct syscore_ops ipic_syscore_ops __ro_after_init = {
 	.suspend = ipic_suspend,
 	.resume = ipic_resume,
 };
