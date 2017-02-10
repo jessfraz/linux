@@ -296,6 +296,7 @@ static struct syscore_ops sched_clock_ops __ro_after_init = {
 
 static int __init sched_clock_syscore_init(void)
 {
+	printk(KERN_INFO "sched_clock_ops\n");
 	register_syscore_ops(&sched_clock_ops);
 
 	return 0;

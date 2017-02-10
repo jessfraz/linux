@@ -1763,6 +1763,7 @@ static struct syscore_ops timekeeping_syscore_ops __ro_after_init = {
 
 static int __init timekeeping_init_ops(void)
 {
+	printk(KERN_INFO "timekeeping_syscore_ops\n");
 	register_syscore_ops(&timekeeping_syscore_ops);
 	return 0;
 }

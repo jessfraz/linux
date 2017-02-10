@@ -191,6 +191,7 @@ static struct syscore_ops irq_pm_syscore_ops __ro_after_init = {
 
 static int __init irq_pm_init_ops(void)
 {
+	printk(KERN_INFO "irq_pm_syscore_ops\n");
 	register_syscore_ops(&irq_pm_syscore_ops);
 	return 0;
 }

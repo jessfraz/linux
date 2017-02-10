@@ -631,6 +631,7 @@ static struct syscore_ops irq_gc_syscore_ops __ro_after_init = {
 
 static int __init irq_gc_init_ops(void)
 {
+	printk(KERN_INFO "irq_gc_syscore_ops\n");
 	register_syscore_ops(&irq_gc_syscore_ops);
 	return 0;
 }
