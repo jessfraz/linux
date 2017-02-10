@@ -1413,7 +1413,7 @@ static void pci_msi_domain_set_desc(msi_alloc_info_t *arg,
 #define pci_msi_domain_set_desc		NULL
 #endif
 
-static struct msi_domain_ops pci_msi_domain_ops_default = {
+static struct msi_domain_ops pci_msi_domain_ops_default __ro_after_init = {
 	.set_desc	= pci_msi_domain_set_desc,
 	.msi_check	= pci_msi_domain_check_cap,
 	.handle_error	= pci_msi_domain_handle_error,
