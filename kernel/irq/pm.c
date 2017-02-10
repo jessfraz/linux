@@ -185,7 +185,7 @@ static void irq_pm_syscore_resume(void)
 	resume_irqs(true);
 }
 
-static struct syscore_ops irq_pm_syscore_ops = {
+static struct syscore_ops irq_pm_syscore_ops __ro_after_init = {
 	.resume		= irq_pm_syscore_resume,
 };
 
