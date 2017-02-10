@@ -958,7 +958,7 @@ static irq_hw_number_t hv_msi_domain_ops_get_hwirq(struct msi_domain_info *info,
 	return arg->msi_hwirq;
 }
 
-static struct msi_domain_ops hv_msi_ops = {
+static struct msi_domain_ops hv_msi_ops __ro_after_init = {
 	.get_hwirq	= hv_msi_domain_ops_get_hwirq,
 	.msi_prepare	= pci_msi_prepare,
 	.set_desc	= pci_msi_set_desc,
