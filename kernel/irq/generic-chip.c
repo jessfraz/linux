@@ -623,7 +623,7 @@ static void irq_gc_shutdown(void)
 	}
 }
 
-static struct syscore_ops irq_gc_syscore_ops = {
+static struct syscore_ops irq_gc_syscore_ops __ro_after_init = {
 	.suspend = irq_gc_suspend,
 	.resume = irq_gc_resume,
 	.shutdown = irq_gc_shutdown,

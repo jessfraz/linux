@@ -217,7 +217,7 @@ static int msi_domain_ops_check(struct irq_domain *domain,
 	return 0;
 }
 
-static struct msi_domain_ops msi_domain_ops_default = {
+static struct msi_domain_ops msi_domain_ops_default __ro_after_init = {
 	.get_hwirq	= msi_domain_ops_get_hwirq,
 	.msi_init	= msi_domain_ops_init,
 	.msi_check	= msi_domain_ops_check,
