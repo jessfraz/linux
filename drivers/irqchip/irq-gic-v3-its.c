@@ -1427,7 +1427,7 @@ out:
 	return 0;
 }
 
-static struct msi_domain_ops its_msi_domain_ops = {
+static struct msi_domain_ops its_msi_domain_ops __ro_after_init = {
 	.msi_prepare	= its_msi_prepare,
 };
 

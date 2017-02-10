@@ -58,7 +58,7 @@ static int its_pmsi_prepare(struct irq_domain *domain, struct device *dev,
 					  dev, nvec, info);
 }
 
-static struct msi_domain_ops its_pmsi_ops = {
+static struct msi_domain_ops its_pmsi_ops __ro_after_init = {
 	.msi_prepare	= its_pmsi_prepare,
 };
 

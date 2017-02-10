@@ -91,7 +91,7 @@ static int its_pci_msi_prepare(struct irq_domain *domain, struct device *dev,
 					  dev, dev_alias.count, info);
 }
 
-static struct msi_domain_ops its_pci_msi_ops = {
+static struct msi_domain_ops its_pci_msi_ops __ro_after_init = {
 	.msi_prepare	= its_pci_msi_prepare,
 };
 

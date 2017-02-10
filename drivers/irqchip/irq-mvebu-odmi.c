@@ -149,7 +149,7 @@ static struct irq_chip odmi_msi_irq_chip = {
 	.name	= "ODMI",
 };
 
-static struct msi_domain_ops odmi_msi_ops = {
+static struct msi_domain_ops odmi_msi_ops __ro_after_init = {
 };
 
 static struct msi_domain_info odmi_msi_domain_info = {

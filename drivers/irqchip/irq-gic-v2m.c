@@ -240,7 +240,7 @@ static struct irq_chip gicv2m_pmsi_irq_chip = {
 	.name			= "pMSI",
 };
 
-static struct msi_domain_ops gicv2m_pmsi_ops = {
+static struct msi_domain_ops gicv2m_pmsi_ops __ro_after_init = {
 };
 
 static struct msi_domain_info gicv2m_pmsi_domain_info = {
