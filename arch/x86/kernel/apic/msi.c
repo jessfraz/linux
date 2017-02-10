@@ -121,7 +121,7 @@ void pci_msi_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc)
 }
 EXPORT_SYMBOL_GPL(pci_msi_set_desc);
 
-static struct msi_domain_ops pci_msi_domain_ops = {
+static struct msi_domain_ops pci_msi_domain_ops __ro_after_init = {
 	.get_hwirq	= pci_msi_get_hwirq,
 	.msi_prepare	= pci_msi_prepare,
 	.set_desc	= pci_msi_set_desc,
@@ -207,7 +207,7 @@ static int dmar_msi_init(struct irq_domain *domain,
 	return 0;
 }
 
-static struct msi_domain_ops dmar_msi_domain_ops = {
+static struct msi_domain_ops dmar_msi_domain_ops __ro_after_init = {
 	.get_hwirq	= dmar_msi_get_hwirq,
 	.msi_init	= dmar_msi_init,
 };
@@ -304,7 +304,7 @@ static void hpet_msi_free(struct irq_domain *domain,
 	irq_clear_status_flags(virq, IRQ_MOVE_PCNTXT);
 }
 
-static struct msi_domain_ops hpet_msi_domain_ops = {
+static struct msi_domain_ops hpet_msi_domain_ops __ro_after_init = {
 	.get_hwirq	= hpet_msi_get_hwirq,
 	.msi_init	= hpet_msi_init,
 	.msi_free	= hpet_msi_free,
