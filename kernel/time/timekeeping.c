@@ -1756,7 +1756,7 @@ int timekeeping_suspend(void)
 }
 
 /* sysfs resume/suspend bits for timekeeping */
-static struct syscore_ops timekeeping_syscore_ops = {
+static struct syscore_ops timekeeping_syscore_ops __ro_after_init = {
 	.resume		= timekeeping_resume,
 	.suspend	= timekeeping_suspend,
 };
