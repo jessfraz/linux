@@ -1181,7 +1181,7 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
 	 */
 	objcg = get_obj_cgroup_from_page(page);
 	if (objcg && !obj_cgroup_may_zswap(objcg)) {
-		ret = -ENOSPC;
+		ret = -ENOMEM;
 		goto reject;
 	}
 
