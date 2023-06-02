@@ -1069,11 +1069,17 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
 
 			lruvec_memcg_debug(lruvec, page_folio(page));
 
-			/* Try get exclusive access under lock */
+			/*
+			 * Try get exclusive access under lock. If marked for
+			 * skip, the scan is aborted unless the current context
+			 * is a rescan to reach the end of the pageblock.
+			 */
 			if (!skip_updated && valid_page) {
 				skip_updated = true;
-				if (test_and_set_skip(cc, valid_page))
+				if (test_and_set_skip(cc, valid_page) &&
+				    !cc->finish_pageblock) {
 					goto isolate_abort;
+				}
 			}
 
 			/*
