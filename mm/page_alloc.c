@@ -3506,6 +3506,15 @@ should_compact_retry(struct alloc_context *ac, int order, int alloc_flags,
 		return false;
 
 	/*
+	 * Compaction was skipped due to a lack of free order-0
+	 * migration targets. Continue if reclaim can help.
+	 */
+	if (compact_result == COMPACT_SKIPPED) {
+		ret = compaction_zonelist_suitable(ac, order, alloc_flags);
+		goto out;
+	}
+
+	/*
 	 * Compaction managed to coalesce some page blocks, but the
 	 * allocation failed presumably due to a race. Retry some.
 	 */
@@ -3522,17 +3531,10 @@ should_compact_retry(struct alloc_context *ac, int order, int alloc_flags,
 		if (order > PAGE_ALLOC_COSTLY_ORDER)
 			max_retries /= 4;
 
-		ret = ++(*compaction_retries) <= max_retries;
-		goto out;
-	}
-
-	/*
-	 * Compaction was skipped due to a lack of free order-0
-	 * migration targets. Continue if reclaim can help.
-	 */
-	if (compact_result == COMPACT_SKIPPED) {
-		ret = compaction_zonelist_suitable(ac, order, alloc_flags);
-		goto out;
+		if (++(*compaction_retries) <= max_retries) {
+			ret = true;
+			goto out;
+		}
 	}
 
 	/*
