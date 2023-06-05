@@ -2102,7 +2102,7 @@ static bool purge_fragmented_block(struct vmap_block *vb,
 		return false;
 
 	/* Don't overeagerly purge usable blocks unless requested */
-	if (!force_purge && vb->free < VMAP_PURGE_THRESHOLD)
+	if (!(force_purge || vb->free < VMAP_PURGE_THRESHOLD))
 		return false;
 
 	/* prevent further allocs after releasing lock */
