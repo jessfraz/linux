@@ -299,7 +299,7 @@ out:
 	return origbrk;
 }
 
-#if defined(CONFIG_DEBUG_VM)
+#if defined(CONFIG_DEBUG_VM_MAPLE_TREE)
 static void validate_mm(struct mm_struct *mm)
 {
 	int bug = 0;
@@ -307,10 +307,7 @@ static void validate_mm(struct mm_struct *mm)
 	struct vm_area_struct *vma;
 	VMA_ITERATOR(vmi, mm, 0);
 
-#if defined(CONFIG_DEBUG_VM_MAPLE_TREE)
 	mt_validate(&mm->mm_mt);
-#endif
-
 	for_each_vma(vmi, vma) {
 #ifdef CONFIG_DEBUG_VM_RB
 		struct anon_vma *anon_vma = vma->anon_vma;
@@ -353,9 +350,9 @@ static void validate_mm(struct mm_struct *mm)
 	VM_BUG_ON_MM(bug, mm);
 }
 
-#else /* !CONFIG_DEBUG_VM */
+#else /* !CONFIG_DEBUG_VM_MAPLE_TREE */
 #define validate_mm(mm) do { } while (0)
-#endif /* CONFIG_DEBUG_VM */
+#endif /* CONFIG_DEBUG_VM_MAPLE_TREE */
 
 /*
  * vma has some anon_vma assigned, and is already inserted on that
