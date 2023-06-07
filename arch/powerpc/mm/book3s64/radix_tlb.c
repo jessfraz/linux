@@ -795,8 +795,16 @@ void exit_lazy_flush_tlb(struct mm_struct *mm, bool always_flush)
 		goto out;
 
 	if (current->active_mm == mm) {
-		/* Is a kernel thread and is using mm as the lazy tlb */
+		unsigned long flags;
+
+		/*
+		 * It is a kernel thread and is using mm as the lazy tlb, so
+		 * switch it to init_mm. This is not always called from IPI
+		 * (e.g., flush_type_needed), so must disable irqs.
+		 */
+		local_irq_save(flags);
 		kthread_end_lazy_tlb_mm();
+		local_irq_restore(flags);
 	}
 
 	/*
