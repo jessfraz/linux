@@ -633,7 +633,6 @@ struct snd_soc_compr_ops {
 	int (*startup)(struct snd_compr_stream *);
 	void (*shutdown)(struct snd_compr_stream *);
 	int (*set_params)(struct snd_compr_stream *);
-	int (*trigger)(struct snd_compr_stream *);
 };
 
 struct snd_soc_component*
@@ -878,6 +877,7 @@ asoc_link_to_platform(struct snd_soc_dai_link *link, int n) {
 #define COMP_DUMMY()			{ .name = "snd-soc-dummy", .dai_name = "snd-soc-dummy-dai", }
 
 extern struct snd_soc_dai_link_component null_dailink_component[0];
+extern struct snd_soc_dai_link_component asoc_dummy_dlc;
 
 
 struct snd_soc_codec_conf {
@@ -1291,6 +1291,7 @@ unsigned int snd_soc_daifmt_parse_clock_provider_raw(struct device_node *np,
 	snd_soc_daifmt_clock_provider_from_bitmap(			\
 		snd_soc_daifmt_parse_clock_provider_as_bitmap(np, prefix))
 
+int snd_soc_get_stream_cpu(struct snd_soc_dai_link *dai_link, int stream);
 int snd_soc_get_dai_id(struct device_node *ep);
 int snd_soc_get_dai_name(const struct of_phandle_args *args,
 			 const char **dai_name);
