@@ -37,6 +37,7 @@
 #include <linux/workqueue.h>
 
 #include "swap.h"
+#include "internal.h"
 
 /*********************************
 * statistics
@@ -587,9 +588,19 @@ static void shrink_worker(struct work_struct *w)
 {
 	struct zswap_pool *pool = container_of(w, typeof(*pool),
 						shrink_work);
+	int ret, failures = 0;
 
-	if (zpool_shrink(pool->zpool, 1, NULL))
-		zswap_reject_reclaim_fail++;
+	do {
+		ret = zpool_shrink(pool->zpool, 1, NULL);
+		if (ret) {
+			zswap_reject_reclaim_fail++;
+			if (ret != -EAGAIN)
+				break;
+			if (++failures == MAX_RECLAIM_RETRIES)
+				break;
+		}
+		cond_resched();
+	} while (!zswap_can_accept());
 	zswap_pool_put(pool);
 }
 
@@ -1195,7 +1206,7 @@ static int zswap_frontswap_store(unsigned type, pgoff_t offset,
 	if (zswap_pool_reached_full) {
 	       if (!zswap_can_accept()) {
 			ret = -ENOMEM;
-			goto reject;
+			goto shrink;
 		} else
 			zswap_pool_reached_full = false;
 	}
@@ -1336,6 +1347,16 @@ shrink:
 	goto reject;
 }
 
+static void zswap_invalidate_entry(struct zswap_tree *tree,
+				   struct zswap_entry *entry)
+{
+	/* remove from rbtree */
+	zswap_rb_erase(&tree->rbroot, entry);
+
+	/* drop the initial reference from entry creation */
+	zswap_entry_put(tree, entry);
+}
+
 /*
  * returns 0 if the page was successfully decompressed
  * return -1 on entry not found or error
@@ -1410,6 +1431,8 @@ stats:
 		count_objcg_event(entry->objcg, ZSWPIN);
 freeentry:
 	spin_lock(&tree->lock);
+	if (!ret && IS_ENABLED(CONFIG_ZSWAP_EXCLUSIVE_LOADS))
+		zswap_invalidate_entry(tree, entry);
 	zswap_entry_put(tree, entry);
 	spin_unlock(&tree->lock);
 
@@ -1430,13 +1453,7 @@ static void zswap_frontswap_invalidate_page(unsigned type, pgoff_t offset)
 		spin_unlock(&tree->lock);
 		return;
 	}
-
-	/* remove from rbtree */
-	zswap_rb_erase(&tree->rbroot, entry);
-
-	/* drop the initial reference from entry creation */
-	zswap_entry_put(tree, entry);
-
+	zswap_invalidate_entry(tree, entry);
 	spin_unlock(&tree->lock);
 }
 
@@ -1479,7 +1496,8 @@ static const struct frontswap_ops zswap_frontswap_ops = {
 	.load = zswap_frontswap_load,
 	.invalidate_page = zswap_frontswap_invalidate_page,
 	.invalidate_area = zswap_frontswap_invalidate_area,
-	.init = zswap_frontswap_init
+	.init = zswap_frontswap_init,
+	.exclusive_loads = IS_ENABLED(CONFIG_ZSWAP_EXCLUSIVE_LOADS),
 };
 
 /*********************************

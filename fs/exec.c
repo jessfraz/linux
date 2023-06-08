@@ -220,7 +220,7 @@ static struct page *get_arg_page(struct linux_binprm *bprm, unsigned long pos,
 	 */
 	mmap_read_lock(bprm->mm);
 	ret = get_user_pages_remote(bprm->mm, pos, 1, gup_flags,
-			&page, NULL, NULL);
+			&page, NULL);
 	mmap_read_unlock(bprm->mm);
 	if (ret <= 0)
 		return NULL;
@@ -697,6 +697,7 @@ static int shift_arg_pages(struct vm_area_struct *vma, unsigned long shift)
 	if (vma != vma_next(&vmi))
 		return -EFAULT;
 
+	vma_iter_prev_range(&vmi);
 	/*
 	 * cover the whole range: [new_start, old_end)
 	 */
