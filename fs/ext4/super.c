@@ -3692,16 +3692,13 @@ static int ext4_run_li_request(struct ext4_li_request *elr)
 	ext4_group_t group = elr->lr_next_group;
 	unsigned int prefetch_ios = 0;
 	int ret = 0;
+	int nr = EXT4_SB(sb)->s_mb_prefetch;
 	u64 start_time;
 
 	if (elr->lr_mode == EXT4_LI_MODE_PREFETCH_BBITMAP) {
-		elr->lr_next_group = ext4_mb_prefetch(sb, group,
-				EXT4_SB(sb)->s_mb_prefetch, &prefetch_ios);
-		if (prefetch_ios)
-			ext4_mb_prefetch_fini(sb, elr->lr_next_group,
-					      prefetch_ios);
-		trace_ext4_prefetch_bitmaps(sb, group, elr->lr_next_group,
-					    prefetch_ios);
+		elr->lr_next_group = ext4_mb_prefetch(sb, group, nr, &prefetch_ios);
+		ext4_mb_prefetch_fini(sb, elr->lr_next_group, nr);
+		trace_ext4_prefetch_bitmaps(sb, group, elr->lr_next_group, nr);
 		if (group >= elr->lr_next_group) {
 			ret = 1;
 			if (elr->lr_first_not_zeroed != ngroups &&
@@ -5297,6 +5294,19 @@ static int __ext4_fill_super(struct fs_context *fc, struct super_block *sb)
 		goto failed_mount3;
 
 	sbi->s_stripe = ext4_get_stripe_size(sbi);
+	/*
+	 * It's hard to get stripe aligned blocks if stripe is not aligned with
+	 * cluster, just disable stripe and alert user to simpfy code and avoid
+	 * stripe aligned allocation which will rarely successes.
+	 */
+	if (sbi->s_stripe > 0 && sbi->s_cluster_ratio > 1 &&
+	    sbi->s_stripe % sbi->s_cluster_ratio != 0) {
+		ext4_msg(sb, KERN_WARNING,
+			 "stripe (%lu) is not aligned with cluster size (%u), "
+			 "stripe is disabled",
+			 sbi->s_stripe, sbi->s_cluster_ratio);
+		sbi->s_stripe = 0;
+	}
 	sbi->s_extent_max_zeroout_kb = 32;
 
 	/*
