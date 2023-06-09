@@ -41,7 +41,7 @@ struct blk_stat_callback;
 struct blk_crypto_profile;
 
 extern const struct device_type disk_type;
-extern struct device_type part_type;
+extern const struct device_type part_type;
 extern struct class block_class;
 
 /*
@@ -392,6 +392,7 @@ struct request_queue {
 
 	struct blk_queue_stats	*stats;
 	struct rq_qos		*rq_qos;
+	struct mutex		rq_qos_mutex;
 
 	const struct blk_mq_ops	*mq_ops;
 
@@ -487,6 +488,7 @@ struct request_queue {
 	 * for flush operations
 	 */
 	struct blk_flush_queue	*fq;
+	struct list_head	flush_list;
 
 	struct list_head	requeue_list;
 	spinlock_t		requeue_lock;
@@ -836,7 +838,6 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
 
 dev_t part_devt(struct gendisk *disk, u8 partno);
 void inc_diskseq(struct gendisk *disk);
-dev_t blk_lookup_devt(const char *name, int partno);
 void blk_request_module(dev_t devt);
 
 extern int blk_register_queue(struct gendisk *disk);
@@ -1281,13 +1282,16 @@ static inline unsigned int bdev_zone_no(struct block_device *bdev, sector_t sec)
 	return disk_zone_no(bdev->bd_disk, sec);
 }
 
-static inline bool bdev_op_is_zoned_write(struct block_device *bdev,
-					  blk_opf_t op)
+/* Whether write serialization is required for @op on zoned devices. */
+static inline bool op_needs_zoned_write_locking(enum req_op op)
 {
-	if (!bdev_is_zoned(bdev))
-		return false;
-
 	return op == REQ_OP_WRITE || op == REQ_OP_WRITE_ZEROES;
+}
+
+static inline bool bdev_op_is_zoned_write(struct block_device *bdev,
+					  enum req_op op)
+{
+	return bdev_is_zoned(bdev) && op_needs_zoned_write_locking(op);
 }
 
 static inline sector_t bdev_zone_sectors(struct block_device *bdev)
@@ -1463,10 +1467,16 @@ void blkdev_show(struct seq_file *seqf, off_t offset);
 #define BLKDEV_MAJOR_MAX	0
 #endif
 
+struct blk_holder_ops {
+	void (*mark_dead)(struct block_device *bdev);
+};
+
+struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder,
+		const struct blk_holder_ops *hops);
 struct block_device *blkdev_get_by_path(const char *path, fmode_t mode,
-		void *holder);
-struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder);
-int bd_prepare_to_claim(struct block_device *bdev, void *holder);
+		void *holder, const struct blk_holder_ops *hops);
+int bd_prepare_to_claim(struct block_device *bdev, void *holder,
+		const struct blk_holder_ops *hops);
 void bd_abort_claiming(struct block_device *bdev, void *holder);
 void blkdev_put(struct block_device *bdev, fmode_t mode);
 
@@ -1488,6 +1498,7 @@ int sync_blockdev_nowait(struct block_device *bdev);
 void sync_bdevs(bool wait);
 void bdev_statx_dioalign(struct inode *inode, struct kstat *stat);
 void printk_all_partitions(void);
+int __init early_lookup_bdev(const char *pathname, dev_t *dev);
 #else
 static inline void invalidate_bdev(struct block_device *bdev)
 {
@@ -1508,6 +1519,10 @@ static inline void bdev_statx_dioalign(struct inode *inode, struct kstat *stat)
 }
 static inline void printk_all_partitions(void)
 {
+}
+static inline int early_lookup_bdev(const char *pathname, dev_t *dev)
+{
+	return -EINVAL;
 }
 #endif /* CONFIG_BLOCK */
 
