@@ -226,11 +226,15 @@ class SpecStructMember(SpecElement):
     Represents a single struct member attribute.
 
     Attributes:
-        type    string, type of the member attribute
+        type        string, type of the member attribute
+        byte_order  string or None for native byte order
+        enum        string, name of the enum definition
     """
     def __init__(self, family, yaml):
         super().__init__(family, yaml)
         self.type = yaml['type']
+        self.byte_order = yaml.get('byte-order')
+        self.enum = yaml.get('enum')
 
 
 class SpecStruct(SpecElement):
@@ -320,6 +324,7 @@ class SpecFamily(SpecElement):
 
     Attributes:
         proto     protocol type (e.g. genetlink)
+        msg_id_model   enum-model for operations (unified, directional etc.)
         license   spec license (loaded from an SPDX tag on the spec)
 
         attr_sets  dict of attribute sets
@@ -345,6 +350,7 @@ class SpecFamily(SpecElement):
         super().__init__(self, spec)
 
         self.proto = self.yaml.get('protocol', 'genetlink')
+        self.msg_id_model = self.yaml['operations'].get('enum-model', 'unified')
 
         if schema_path is None:
             schema_path = os.path.dirname(os.path.dirname(spec_path)) + f'/{self.proto}.yaml'
@@ -438,6 +444,10 @@ class SpecFamily(SpecElement):
             else:
                 raise Exception("Can't parse directional ops")
 
+            if req_val == req_val_next:
+                req_val = None
+            if rsp_val == rsp_val_next:
+                rsp_val = None
             op = self.new_operation(elem, req_val, rsp_val)
             req_val = req_val_next
             rsp_val = rsp_val_next
@@ -469,10 +479,9 @@ class SpecFamily(SpecElement):
             attr_set = self.new_attr_set(elem)
             self.attr_sets[elem['name']] = attr_set
 
-        msg_id_model = self.yaml['operations'].get('enum-model', 'unified')
-        if msg_id_model == 'unified':
+        if self.msg_id_model == 'unified':
             self._dictify_ops_unified()
-        elif msg_id_model == 'directional':
+        elif self.msg_id_model == 'directional':
             self._dictify_ops_directional()
 
         for op in self.msgs.values():
