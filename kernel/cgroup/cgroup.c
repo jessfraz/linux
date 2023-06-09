@@ -57,6 +57,7 @@
 #include <linux/file.h>
 #include <linux/fs_parser.h>
 #include <linux/sched/cputime.h>
+#include <linux/sched/deadline.h>
 #include <linux/psi.h>
 #include <net/sock.h>
 
@@ -356,7 +357,7 @@ static bool cgroup_has_tasks(struct cgroup *cgrp)
 	return cgrp->nr_populated_csets;
 }
 
-bool cgroup_is_threaded(struct cgroup *cgrp)
+static bool cgroup_is_threaded(struct cgroup *cgrp)
 {
 	return cgrp->dom_cgrp != cgrp;
 }
@@ -395,7 +396,7 @@ static bool cgroup_can_be_thread_root(struct cgroup *cgrp)
 }
 
 /* is @cgrp root of a threaded subtree? */
-bool cgroup_is_thread_root(struct cgroup *cgrp)
+static bool cgroup_is_thread_root(struct cgroup *cgrp)
 {
 	/* thread root should be a domain */
 	if (cgroup_is_threaded(cgrp))
@@ -618,7 +619,7 @@ EXPORT_SYMBOL_GPL(cgroup_get_e_css);
 static void cgroup_get_live(struct cgroup *cgrp)
 {
 	WARN_ON_ONCE(cgroup_is_dead(cgrp));
-	css_get(&cgrp->self);
+	cgroup_get(cgrp);
 }
 
 /**
@@ -687,21 +688,6 @@ EXPORT_SYMBOL_GPL(of_css);
 		if (!((css) = rcu_dereference_check(			\
 				(cgrp)->subsys[(ssid)],			\
 				lockdep_is_held(&cgroup_mutex)))) { }	\
-		else
-
-/**
- * for_each_e_css - iterate all effective css's of a cgroup
- * @css: the iteration cursor
- * @ssid: the index of the subsystem, CGROUP_SUBSYS_COUNT after reaching the end
- * @cgrp: the target cgroup to iterate css's of
- *
- * Should be called under cgroup_[tree_]mutex.
- */
-#define for_each_e_css(css, ssid, cgrp)					    \
-	for ((ssid) = 0; (ssid) < CGROUP_SUBSYS_COUNT; (ssid)++)	    \
-		if (!((css) = cgroup_e_css_by_mask(cgrp,		    \
-						   cgroup_subsys[(ssid)]))) \
-			;						    \
 		else
 
 /**
@@ -2871,9 +2857,9 @@ int cgroup_migrate(struct task_struct *leader, bool threadgroup,
 	struct task_struct *task;
 
 	/*
-	 * Prevent freeing of tasks while we take a snapshot. Tasks that are
-	 * already PF_EXITING could be freed from underneath us unless we
-	 * take an rcu_read_lock.
+	 * The following thread iteration should be inside an RCU critical
+	 * section to prevent tasks from being freed while taking the snapshot.
+	 * spin_lock_irq() implies RCU critical section here.
 	 */
 	spin_lock_irq(&css_set_lock);
 	task = leader;
@@ -6498,19 +6484,18 @@ err:
 static void cgroup_css_set_put_fork(struct kernel_clone_args *kargs)
 	__releases(&cgroup_threadgroup_rwsem) __releases(&cgroup_mutex)
 {
+	struct cgroup *cgrp = kargs->cgrp;
+	struct css_set *cset = kargs->cset;
+
 	cgroup_threadgroup_change_end(current);
 
+	if (cset) {
+		put_css_set(cset);
+		kargs->cset = NULL;
+	}
+
 	if (kargs->flags & CLONE_INTO_CGROUP) {
-		struct cgroup *cgrp = kargs->cgrp;
-		struct css_set *cset = kargs->cset;
-
 		cgroup_unlock();
-
-		if (cset) {
-			put_css_set(cset);
-			kargs->cset = NULL;
-		}
-
 		if (cgrp) {
 			cgroup_put(cgrp);
 			kargs->cgrp = NULL;
@@ -6694,6 +6679,9 @@ void cgroup_exit(struct task_struct *tsk)
 	css_set_move_task(tsk, cset, NULL, false);
 	list_add_tail(&tsk->cg_list, &cset->dying_tasks);
 	cset->nr_tasks--;
+
+	if (dl_task(tsk))
+		dec_dl_tasks_cs(tsk);
 
 	WARN_ON_ONCE(cgroup_task_frozen(tsk));
 	if (unlikely(!(tsk->flags & PF_KTHREAD) &&
