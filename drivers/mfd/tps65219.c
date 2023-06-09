@@ -106,7 +106,7 @@ static const struct mfd_cell tps65219_cells[] = {
 		.resources = tps65219_regulator_resources,
 		.num_resources = ARRAY_SIZE(tps65219_regulator_resources),
 	},
-	{ .name = "tps65219-gpios", },
+	{ .name = "tps65219-gpio", },
 };
 
 static const struct mfd_cell tps65219_pwrbutton_cell = {
@@ -290,7 +290,7 @@ static struct i2c_driver tps65219_driver = {
 		.name	= "tps65219",
 		.of_match_table = of_tps65219_match_table,
 	},
-	.probe_new	= tps65219_probe,
+	.probe		= tps65219_probe,
 };
 module_i2c_driver(tps65219_driver);
 
